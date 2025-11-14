@@ -42,10 +42,14 @@ app.use((err, req, res, next) => {
 
 // Initialize DB and start server
 initDb().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on ${PORT}`);
-  });
+  if (require.main === module) {
+    app.listen(PORT, () => {
+      console.log(`Server running on ${PORT}`);
+    });
+  }
 }).catch(err => {
   console.error('Failed to initialize database:', err);
   process.exit(1);
 });
+
+module.exports = app;
