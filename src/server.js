@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { PORT, FRONTEND_ORIGIN } = require('./config');
+const fs = require('fs');
+const { PORT, FRONTEND_ORIGIN, UPLOAD_DIR } = require('./config');
 const { initDb } = require('./db');
 const authRoutes = require('./routes/auth');
 const salesRoutes = require('./routes/sales');
@@ -23,12 +24,16 @@ app.use('/api/auth', authRoutes);
 app.use('/api/sales', salesRoutes);
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK' });
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
 });
+
+// Ensure uploads directory exists
+fs.mkdirSync(path.join(__dirname, UPLOAD_DIR), { recursive: true });
 
 // Initialize DB and start server
 initDb().then(() => {
+  console.log('Database initialized successfully');
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });

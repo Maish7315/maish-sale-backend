@@ -19,8 +19,13 @@ const submitSale = async (req, res) => {
   const timestamp = now.toISOString();
   const photoPath = req.file ? req.file.filename : null;
 
+  if (req.file) {
+    console.log(`File uploaded: ${req.file.filename}`);
+  }
+
   try {
     const sale = await Sale.create(userId, item_description, amountCents, commissionCents, timestamp, photoPath);
+    console.log(`Sale created: ${sale.id} by user ${userId}`);
     res.status(201).json(sale);
   } catch (error) {
     res.status(500).json({ error: 'Server error' });

@@ -12,6 +12,7 @@ const signup = async (req, res) => {
   try {
     const user = await User.create(username, full_name, password);
     const token = generateToken(user);
+    console.log(`User registered: ${username}`);
     res.status(201).json({ token });
   } catch (error) {
     if (error.code === 'SQLITE_CONSTRAINT' || error.code === '23505') {
@@ -43,6 +44,7 @@ const login = async (req, res) => {
     }
     await LoginAttempt.log(username, true, ip);
     const token = generateToken({ id: user.id, username: user.username, role: user.role });
+    console.log(`User logged in: ${username}`);
     res.json({ token });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });

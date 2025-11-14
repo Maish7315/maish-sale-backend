@@ -1,5 +1,5 @@
 const { db, isSQLite } = require('../db');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 class User {
   static async create(username, fullName, password) {
