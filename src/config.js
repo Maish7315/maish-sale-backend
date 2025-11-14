@@ -2,8 +2,7 @@ require('dotenv').config();
 
 module.exports = {
   JWT_SECRET: process.env.JWT_SECRET,
-  FRONTEND_ORIGIN: process.env.FRONTEND_ORIGIN,
-  UPLOAD_DIR: process.env.UPLOAD_DIR || 'uploads',
-  PORT: process.env.PORT || 10000,
-  DATABASE_URL: process.env.DATABASE_URL || 'sqlite:./database.db',
+  FRONTEND_URL: process.env.FRONTEND_URL,
+  CLOUDINARY_URL: process.env.CLOUDINARY_URL,
+  DATABASE_URL: process.env.DATABASE_URL,
 };

@@ -1,20 +1,24 @@
 # Maish Sale Sync Backend
 
-A Node.js backend for the Maish Sale Sync application, providing authentication, sales management, and file upload functionality.
+A serverless Node.js backend for the Maish Sale Sync application, deployed on Vercel. Provides authentication, sales management, and cloud file upload functionality.
 
 ## Features
 
 - User authentication (signup/login)
-- Sales submission with optional receipt uploads
-- SQLite database for data persistence
+- Sales submission with optional receipt uploads to Cloudinary
+- PostgreSQL database (Supabase/PlanetScale recommended)
 - JWT-based authentication
-- File upload handling for images
+- Serverless functions compatible with Vercel
+- Cloud storage for images (Cloudinary)
 - CORS support for frontend integration
 
 ## Prerequisites
 
 - Node.js (version 18.x or higher)
 - npm
+- Vercel CLI (for local development)
+- Cloudinary account (for image storage)
+- PostgreSQL database (Supabase recommended)
 
 ## Installation
 
@@ -35,91 +39,115 @@ A Node.js backend for the Maish Sale Sync application, providing authentication,
 
 4. Update the `.env` file with your configuration:
    - `JWT_SECRET`: A secure secret key for JWT tokens
-   - `FRONTEND_ORIGIN`: The origin of your frontend application (e.g., `http://localhost:3000`)
-   - `UPLOAD_DIR`: Directory for uploaded files (default: `uploads`)
-   - `PORT`: Port for the server (default: 10000)
-   - `DATABASE_URL`: Database connection string (default: `sqlite:./database.db`)
+   - `FRONTEND_URL`: The URL of your frontend application (e.g., `https://your-frontend.vercel.app`)
+   - `CLOUDINARY_URL`: Your Cloudinary URL (e.g., `cloudinary://api_key:api_secret@cloud_name`)
+   - `DATABASE_URL`: PostgreSQL connection string (e.g., from Supabase)
 
 ## Running the Application
 
-### Development
+### Local Development with Vercel
 ```bash
 npm run dev
 ```
 
-### Production
-```bash
-npm start
-```
+This uses `vercel dev` to run the serverless functions locally.
 
-The server will start on the port specified in your `.env` file (default: 10000).
+### Production
+The backend is automatically deployed to Vercel when pushed to the main branch.
 
 ## API Endpoints
+
+All endpoints are serverless functions deployed on Vercel.
 
 ### Authentication
 - `POST /api/auth/signup` - Register a new user
 - `POST /api/auth/login` - Login user
 
 ### Sales
-- `POST /api/sales/create` - Create a new sale (requires authentication)
-- `GET /api/sales/me` - Get user's sales (requires authentication)
+- `POST /api/sales/createSale` - Create a new sale with optional receipt upload (requires authentication)
+- `GET /api/sales/getSales` - Get user's sales (requires authentication)
 
 ### Health Check
 - `GET /api/health` - Health check endpoint
 
-## Deployment on Render
+## Deployment on Vercel
 
-1. Push your code to a GitHub repository.
+1. **Install Vercel CLI** (if not already installed):
+   ```bash
+   npm install -g vercel
+   ```
 
-2. Connect your GitHub repository to Render:
-   - Go to [Render](https://render.com) and sign in.
-   - Click "New" and select "Web Service".
-   - Connect your GitHub repository.
+2. **Login to Vercel**:
+   ```bash
+   vercel login
+   ```
 
-3. Configure the service:
-   - **Name**: Choose a name for your service.
-   - **Environment**: Select "Node".
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-   - **Root Directory**: `backend` (if your backend is in a subdirectory)
+3. **Deploy the backend**:
+   ```bash
+   cd backend
+   vercel --prod
+   ```
 
-4. Set environment variables in Render:
-   - `JWT_SECRET`: Your JWT secret
-   - `FRONTEND_ORIGIN`: Your frontend URL (e.g., `https://your-frontend.onrender.com`)
-   - `UPLOAD_DIR`: `uploads`
-   - `PORT`: `10000` (Render will override this, but it's good to set)
-   - `DATABASE_URL`: `sqlite:./database.db`
+4. **Set Environment Variables** in Vercel dashboard or via CLI:
+   - `JWT_SECRET`: Your JWT secret key
+   - `FRONTEND_URL`: Your frontend URL (e.g., `https://your-frontend.vercel.app`)
+   - `CLOUDINARY_URL`: Your Cloudinary URL
+   - `DATABASE_URL`: Your PostgreSQL connection string
 
-5. Deploy the service.
+5. **Database Setup**:
+   - Use Supabase for PostgreSQL database
+   - The tables will be created automatically on first run
+   - Ensure your database allows connections from Vercel's IP ranges
 
-Note: Since this uses SQLite, the database file will be created in the persistent disk provided by Render. Ensure your service has a persistent disk if needed, but for SQLite, it should work with the local file system.
+6. **Cloudinary Setup**:
+   - Create a Cloudinary account
+   - Get your Cloudinary URL from the dashboard
+   - Set up a folder for receipt uploads
+
+## Connecting Frontend
+
+Update your frontend's API base URL to point to the deployed Vercel backend:
+
+```javascript
+const API_BASE_URL = 'https://your-backend.vercel.app';
+```
+
+## Database Schema
+
+The application automatically creates the following tables:
+
+- `users`: User accounts
+- `sales`: Sales records with receipt URLs
+- `login_attempts`: Security logging
 
 ## Project Structure
 
 ```
 backend/
+├── api/                   # Serverless functions
+│   ├── auth/
+│   │   ├── signup.js      # User registration
+│   │   └── login.js       # User login
+│   ├── sales/
+│   │   ├── createSale.js  # Create sale with upload
+│   │   └── getSales.js    # Get user sales
+│   └── health.js          # Health check
 ├── src/
-│   ├── server.js          # Main server file
 │   ├── config.js          # Configuration
-│   ├── db.js              # Database initialization
-│   ├── routes/
-│   │   ├── auth.js        # Authentication routes
-│   │   └── sales.js       # Sales routes
-│   ├── controllers/
-│   │   ├── authController.js    # Auth logic
-│   │   └── salesController.js   # Sales logic
+│   ├── db.js              # Database connection
 │   ├── models/
 │   │   ├── User.js        # User model
 │   │   ├── Sale.js        # Sale model
 │   │   └── LoginAttempt.js # Login attempt model
-│   ├── middleware/
-│   │   └── auth.js        # Authentication middleware
 │   ├── services/
 │   │   └── authService.js # Auth services
-│   └── utils/             # Utility functions
-├── uploads/               # Uploaded files
+│   └── utils/
+│       ├── auth.js        # Auth utilities
+│       ├── cloudinary.js  # Cloudinary upload
+│       └── multipart.js   # Multipart parsing
 ├── package.json
 ├── package-lock.json
+├── vercel.json            # Vercel configuration
 ├── .env.example
 ├── .gitignore
 └── README.md
