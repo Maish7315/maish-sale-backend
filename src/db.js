@@ -10,6 +10,7 @@ if (DATABASE_URL.startsWith('sqlite:')) {
 } else {
   db = new Pool({
     connectionString: DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
   });
 }
 
