@@ -5,7 +5,7 @@ import { generateToken } from '../auth.js';
 
 const router = express.Router();
 
-// POST /api/auth/signup
+// POST /signup
 router.post('/signup', async (req, res) => {
   try {
     const { username, full_name, password } = req.body;
@@ -42,7 +42,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// POST /api/auth/login
+// POST /login
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;

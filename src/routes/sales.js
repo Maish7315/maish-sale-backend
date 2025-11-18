@@ -17,7 +17,7 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// POST /api/sales/createSale
+// POST /createSale
 router.post('/createSale', authMiddleware, upload.single('receipt'), async (req, res) => {
   try {
     const { item_description, amount } = req.body;
@@ -79,7 +79,7 @@ router.post('/createSale', authMiddleware, upload.single('receipt'), async (req,
   }
 });
 
-// GET /api/sales/getSales
+// GET /getSales
 router.get('/getSales', authMiddleware, async (req, res) => {
   try {
     const sales = await Sale.findByUserId(req.user.id);

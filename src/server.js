@@ -16,7 +16,7 @@ await initDatabase();
 
 // Middleware
 app.use(cors({
-  origin: "*",
+  origin: "https://maishsale.netlify.app",
   methods: "GET,POST,PUT,DELETE,OPTIONS",
   allowedHeaders: "Content-Type,Authorization"
 }));
@@ -27,8 +27,8 @@ app.use(express.json());
 const upload = multer({ dest: 'uploads/' });
 
 // Routes
-app.use('/api', authRoutes);
-app.use('/api', salesRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/sales', salesRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
